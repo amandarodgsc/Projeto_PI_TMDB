@@ -1,16 +1,11 @@
-import { useRoute } from "@react-navigation/native";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { api } from "../../services/api";
-import {
-  BookmarkSimple,
-  CalendarBlank,
-  CaretLeft,
-  Clock,
-  Star,
-} from "phosphor-react-native";
-import { useNavigation } from '@react-navigation/native';
+import { BookmarkSimple, CalendarBlank, CaretLeft, Clock, Star } from "phosphor-react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { ActivityIndicator } from 'react-native';
+import { MovieContext } from "../../contexts/MoviesContext";
+
 
 type MovieDetails = {
   id: number;
@@ -34,6 +29,7 @@ export function Details() {
   const { movieId } = route.params as RouterProps;
   const navigation = useNavigation();
   const [isFavorite, setIsFavorite] = useState(false);
+  const { addFavoriteMovie, removeFavoriteMovie, favoriteMovies } = useContext(MovieContext);
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
@@ -49,10 +45,10 @@ export function Details() {
     };
     fetchMovieDetails();
 
-    // You may want to check here if the movie is in favorites and set isFavorite accordingly
-    const isMovieInFavorites = checkIfMovieIsInFavorites(movieId);
+    // Check if the movie is in favorites and set isFavorite accordingly
+    const isMovieInFavorites = favoriteMovies.includes(movieId);
     setIsFavorite(isMovieInFavorites);
-  }, [movieId]);
+  }, [movieId, favoriteMovies]);
 
   function getYear(data: string) {
     const ano = new Date(data).getFullYear();
@@ -61,15 +57,11 @@ export function Details() {
 
   const toggleFavorite = () => {
     if (isFavorite) {
-      removeFromFavorites(movieId);
+      removeFavoriteMovie(movieId);
     } else {
-      addToFavorites(movieId);
+      addFavoriteMovie(movieId);
     }
     setIsFavorite(!isFavorite);
-  };
-
-  const navigateToMyList = () => {
-    navigation.navigate('MyList');
   };
 
   return (
@@ -79,7 +71,7 @@ export function Details() {
           <CaretLeft color="#fff" size={32} weight="thin" />
         </TouchableOpacity>
         <Text style={styles.headerText}>Detalhes</Text>
-        <TouchableOpacity onPress={navigateToMyList}>
+        <TouchableOpacity onPress={toggleFavorite}>
           <BookmarkSimple color={isFavorite ? "gold" : "#fff"} size={32} weight="thin" />
         </TouchableOpacity>
       </View>
@@ -115,20 +107,20 @@ export function Details() {
             <View style={styles.descriptionGroup}>
               <Star
                 color={
-                  movieDetails?.vote_average.toFixed(2) >= "7"
+                  movieDetails?.vote_average.toFixed(2) >= 7
                     ? "#FF8700"
                     : "#92929D"
                 }
                 size={25}
                 weight={
-                  movieDetails?.vote_average.toFixed(2) >= "7"
+                  movieDetails?.vote_average.toFixed(2) >= 7
                     ? "duotone"
                     : "thin"
                 }
               />
               <Text
                 style={[
-                  movieDetails?.vote_average.toFixed(2) >= "7"
+                  movieDetails?.vote_average.toFixed(2) >= 7
                     ? styles.descriptionText1
                     : styles.descriptionText,
                 ]}
@@ -220,25 +212,3 @@ const styles = StyleSheet.create({
     textAlign: "justify",
   },
 });
-
-// Implement these functions based on your application's requirements
-function checkIfMovieIsInFavorites(movieId: number) {
-  // Check if the movie with movieId is in the user's favorites
-  // Implement this function based on your data storage mechanism (e.g., local storage or server)
-  return false; // Placeholder return value
-}
-
-function addToFavorites(movieId: number) {
-  // Add the movie with movieId to the user's favorites
-  // Implement this function based on your data storage mechanism (e.g., local storage or server)
-}
-
-function removeFromFavorites(movieId: number) {
-  // Remove the movie with movieId from the user's favorites
-  // Implement this function based on your data storage mechanism (e.g., local storage or server)
-}
-
-function getYear(data: string) {
-  const ano = new Date(data).getFullYear();
-  return ano;
-}

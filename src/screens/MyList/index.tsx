@@ -27,7 +27,7 @@ export function MyList() {
         <TouchableOpacity onPress={() => goBack()}>
           <CaretLeft color="#fff" size={32} weight="thin" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Minha Lista</Text>
+        <Text style={styles.headerText}> Filmes Favoritos: </Text>
         <View
           style={{
             width: 30,

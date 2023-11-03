@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createContext, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { createContext, ReactNode, useCallback, useEffect, useState } from "react";
 import { api } from "../services/api";
 
 type Movie = {
@@ -48,18 +48,7 @@ export const MovieProvider = ({ children }: MovieProviderProps) => {
       if (!favoriteMovies.includes(movieId)) {
         const newFavoriteMovies = [...favoriteMovies, movieId];
         setFavoriteMovies(newFavoriteMovies);
-        await AsyncStorage.setItem(
-          "@FavoriteMovies",
-          JSON.stringify(newFavoriteMovies)
-        );
-
-        try {
-          const response = await api.get<Movie>(`/movie/${movieId}`);
-          const newMovie = response.data;
-          setAllFavoriteMovies((prevMovies) => [...prevMovies, newMovie]);
-        } catch (error) {
-          console.log(error);
-        }
+        await AsyncStorage.setItem("@FavoriteMovies", JSON.stringify(newFavoriteMovies));
       }
     },
     [favoriteMovies]
@@ -69,38 +58,13 @@ export const MovieProvider = ({ children }: MovieProviderProps) => {
     async (movieId: number) => {
       const newFavoriteMovies = favoriteMovies.filter((id) => id !== movieId);
       setFavoriteMovies(newFavoriteMovies);
-      await AsyncStorage.setItem(
-        "@FavoriteMovies",
-        JSON.stringify(newFavoriteMovies)
-      );
-
-      setAllFavoriteMovies((prevMovies) => prevMovies.filter((movie) => movie.id !== movieId));
+      await AsyncStorage.setItem("@FavoriteMovies", JSON.stringify(newFavoriteMovies));
     },
     [favoriteMovies]
-  );
-
-  const parsedFavoriteMovies = useMemo(() => favoriteMovies, [favoriteMovies]);
-
-  const getAllFavoriteMovies = useCallback(async () => {
-    try {
-      const movies = await Promise.all(
-        parsedFavoriteMovies.map(async (movieId: number) => {
-          const response = await api.get<Movie>(`/movie/${movieId}`);
-          return response.data;
-        })
-      );
-      setAllFavoriteMovies(movies);
-    } catch (error) {
-      console.log(error);
-    }
-  }, [parsedFavoriteMovies]);
-
-  useEffect(() => {
-    getAllFavoriteMovies();
-  }, [parsedFavoriteMovies, getAllFavoriteMovies]);
-
+  ); 
+  
   const contextData: MovieContextData = {
-    favoriteMovies: parsedFavoriteMovies,
+    favoriteMovies,
     allFavoriteMovies,
     addFavoriteMovie,
     removeFavoriteMovie,
@@ -114,3 +78,4 @@ export const MovieProvider = ({ children }: MovieProviderProps) => {
 };
 
 export { Movie };
+ 
