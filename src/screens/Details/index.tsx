@@ -68,10 +68,10 @@ export function Details() {
     setIsFavorite(!isFavorite);
   };
 
- const navigateToMyList = () => {
-  navigation.navigate; // Use 'Mylist' instead of 'MinhaLista'
-};
-  
+  const navigateToMyList = () => {
+    navigation.navigate('MyList');
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>

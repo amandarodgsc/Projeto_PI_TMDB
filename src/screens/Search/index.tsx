@@ -1,4 +1,14 @@
-import { useNavigation } from "@react-navigation/native";
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import {
   CalendarBlank,
   CaretLeft,
@@ -6,18 +16,9 @@ import {
   MagnifyingGlass,
   Star,
   WarningCircle,
-} from "phosphor-react-native";
-import React, { useState } from "react";
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import api from "../../services/api";
+} from 'phosphor-react-native';
+
+import { api } from "../../services/api";
 
 interface Movie {
   id: number;
@@ -30,12 +31,12 @@ interface Movie {
 
 export function Search() {
   const [searchResults, setSearchResults] = useState<Movie[]>([]);
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState('');
 
   const { navigate, goBack } = useNavigation();
 
   const searchMovies = async (query: string) => {
-    const response = await api.get("/search/movie", {
+    const response = await api.get('/search/movie', {
       params: {
         query,
       },
@@ -79,7 +80,7 @@ export function Search() {
           <TouchableOpacity
             style={styles.card}
             key={movie.id}
-            onPress={() => navigate("Details", { movieId: movie.id })}
+            onPress={() => navigate('Details', { movieId: movie.id })}
           >
             <Image
               style={styles.cardImage}
@@ -120,47 +121,47 @@ export function Search() {
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1E1E1E",
+    backgroundColor: '#1E1E1E',
   },
   header: {
     paddingTop: 30,
     height: 115,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
   },
   headerText: {
-    color: "#fff",
-    fontWeight: "700",
+    color: '#fff',
+    fontWeight: '700',
     fontSize: 18,
   },
   containerInput: {
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "#3A3F47",
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#3A3F47',
     height: 42,
     padding: 10,
     borderRadius: 16,
   },
   input: {
-    color: "#fff",
-    width: "80%",
+    color: '#fff',
+    width: '80%',
   },
 
   content: {
     padding: 20,
   },
   contentMyList: {
-    width: "100%",
+    width: '100%',
     padding: 20,
   },
   card: {
     width: 250,
     marginBottom: 20,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 15,
   },
   cardImage: {
@@ -173,25 +174,25 @@ export const styles = StyleSheet.create({
     gap: 10,
   },
   cardInfoTitle: {
-    color: "#Fff",
+    color: '#Fff',
     lineHeight: 24,
     fontSize: 16,
   },
   cardInfoInfoMovie: {
-    flexDirection: "column",
-    alignItems: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'flex-start',
     gap: 10,
   },
   cardInfoInfoMovieContent: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 10,
   },
   cardInfoInfoMovieContentText: {
-    color: "#FFF",
+    color: '#FFF',
   },
   cardInfoInfoMovieContentText2: {
-    color: "#FF8700",
-    fontWeight: "700",
+    color: '#FF8700',
+    fontWeight: '700',
   },
 });

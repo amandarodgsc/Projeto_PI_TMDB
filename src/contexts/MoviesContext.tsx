@@ -1,25 +1,17 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  createContext,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-
-import api from "../services/api";
+import { createContext, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { api } from "../services/api";
 
 type Movie = {
   id: number;
-  title: string;                                                                                                                        
+  title: string;
   poster_path: string;
   runtime: string;
   release_date: string;
   vote_average: number;
 };
 
-interface MovieContextData { 
+interface MovieContextData {
   favoriteMovies: number[];
   allFavoriteMovies: Movie[];
   addFavoriteMovie: (movieId: number) => void;
@@ -60,6 +52,14 @@ export const MovieProvider = ({ children }: MovieProviderProps) => {
           "@FavoriteMovies",
           JSON.stringify(newFavoriteMovies)
         );
+
+        try {
+          const response = await api.get<Movie>(`/movie/${movieId}`);
+          const newMovie = response.data;
+          setAllFavoriteMovies((prevMovies) => [...prevMovies, newMovie]);
+        } catch (error) {
+          console.log(error);
+        }
       }
     },
     [favoriteMovies]
@@ -73,6 +73,8 @@ export const MovieProvider = ({ children }: MovieProviderProps) => {
         "@FavoriteMovies",
         JSON.stringify(newFavoriteMovies)
       );
+
+      setAllFavoriteMovies((prevMovies) => prevMovies.filter((movie) => movie.id !== movieId));
     },
     [favoriteMovies]
   );
