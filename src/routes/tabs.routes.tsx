@@ -1,9 +1,10 @@
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { BookmarkSimple, House, MagnifyingGlass } from "phosphor-react-native";
-import { Home } from "../screens/Home";
-import { Search } from "../screens/Search";
-import { MyList } from "../screens/MyList";
-import { Details } from "../screens/Details";
+import React from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { BookmarkSimple, House, MagnifyingGlass } from 'phosphor-react-native';
+import { Home } from '../screens/Home';
+import { Search } from '../screens/Search';
+import MyList from '../screens/MyList'; // Corrigi a importação para o MyList
+import { Details } from '../screens/Details';
 
 const { Navigator, Screen } = createBottomTabNavigator();
 
@@ -12,15 +13,15 @@ export function TabRoutes() {
     <Navigator
       screenOptions={{
         tabBarStyle: {
-          backgroundColor: "#242A32",
+          backgroundColor: '#242A32',
           height: 78,
-          alignItems: "center",
+          alignItems: 'center',
           borderTopWidth: 1,
-          borderTopColor: "#0296E5",
+          borderTopColor: '#0296E5',
         },
         headerShown: false,
-        tabBarActiveTintColor: "#0296E5",
-        tabBarInactiveTintColor: "#67686D",
+        tabBarActiveTintColor: '#0296E5',
+        tabBarInactiveTintColor: '#67686D',
         tabBarShowLabel: false,
       }}
     >
@@ -33,16 +34,14 @@ export function TabRoutes() {
           ),
         }}
       />
-
-<Screen
+      <Screen
         name="Details"
         component={Details}
         options={{
-          tabBarButton:() => null,
+          tabBarButton: () => null,
         }}
       />
-
-<Screen
+      <Screen
         name="MyList"
         component={MyList}
         options={{
@@ -51,8 +50,7 @@ export function TabRoutes() {
           ),
         }}
       />
-
-<Screen
+      <Screen
         name="Search"
         component={Search}
         options={{
@@ -61,7 +59,6 @@ export function TabRoutes() {
           ),
         }}
       />
-
     </Navigator>
   );
 }
