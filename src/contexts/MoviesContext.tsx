@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, ReactNode, useCallback, useEffect, useState } from "react";
 import { api } from "../services/api";
 
+
 type Movie = {
   id: number;
   title: string;

@@ -7,6 +7,7 @@ import { ActivityIndicator } from 'react-native';
 import { MovieContext } from "../../contexts/MoviesContext";
 
 
+
 type MovieDetails = {
   id: number;
   title: string;
