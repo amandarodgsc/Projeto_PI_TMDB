@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import { CalendarBlank, CaretLeft, Clock, Star } from "phosphor-react-native";
-import { useContext } from "react";
+import { useContext, useEffect, useState, useLayoutEffect } from "react";
 import {
   Image,
   ScrollView,
@@ -9,12 +9,22 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { MovieContext } from "../../contexts/MoviesContext";
 
 export function MyList() {
-  const { allFavoriteMovies } = useContext(MovieContext);
+  // const { allFavoriteMovies } = useContext(MovieContext);
+  const [allFavoriteMovies, setAllFavoriteMovies] = useState([])
   const { goBack, navigate } = useNavigation();
+
+  useLayoutEffect(() => {
+    AsyncStorage.getItem('@FavoriteMovies').then(res => {
+      setAllFavoriteMovies(JSON.parse(res))
+    })
+  }, [])
+
+  console.log('LISTA DE FAVORITOS NA MyList ', allFavoriteMovies)
 
   function getYear(data: string) {
     const ano = new Date(data).getFullYear();
@@ -56,23 +66,23 @@ export function MyList() {
                   <View style={styles.cardInfoInfoMovieContent}>
                     <Star
                       color={
-                        movie.vote_average.toFixed(1) > "7" ? "#FF8700" : "#fff"
+                        movie.vote_average?.toFixed(1) > "7" ? "#FF8700" : "#fff"
                       }
                       size={25}
                       weight={
-                        movie.vote_average.toFixed(1) > "7"
+                        movie.vote_average?.toFixed(1) > "7"
                           ? "duotone"
                           : "light"
                       }
                     />
                     <Text
                       style={[
-                        movie.vote_average.toFixed(1) > "7"
+                        movie.vote_average?.toFixed(1) > "7"
                           ? styles.cardInfoInfoMovieContentText2
                           : styles.cardInfoInfoMovieContentText,
                       ]}
                     >
-                      {movie.vote_average.toFixed(1)}
+                      {movie.vote_average?.toFixed(1)}
                     </Text>
                   </View>
                   <View style={styles.cardInfoInfoMovieContent}>

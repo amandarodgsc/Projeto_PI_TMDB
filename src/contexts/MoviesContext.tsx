@@ -36,6 +36,7 @@ export const MovieProvider = ({ children }: MovieProviderProps) => {
   useEffect(() => {
     async function loadFavoriteMovies() {
       const favoriteMovies = await AsyncStorage.getItem("@FavoriteMovies");
+      console.log('CHAMOU LISTA DE FAVORITOS', JSON.parse(favoriteMovies))
       if (favoriteMovies) {
         setFavoriteMovies(JSON.parse(favoriteMovies));
       }
@@ -49,6 +50,9 @@ export const MovieProvider = ({ children }: MovieProviderProps) => {
         const newFavoriteMovies = [...favoriteMovies, movieId];
         setFavoriteMovies(newFavoriteMovies);
         await AsyncStorage.setItem("@FavoriteMovies", JSON.stringify(newFavoriteMovies));
+        console.log('CHAMOU ADICIONAR')
+        const res = JSON.parse(await AsyncStorage.getItem("@FavoriteMovies"))
+        console.log('LISTA', res)
       }
     },
     [favoriteMovies]
