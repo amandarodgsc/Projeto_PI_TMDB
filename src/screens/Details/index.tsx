@@ -6,8 +6,6 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { ActivityIndicator } from 'react-native';
 import { MovieContext } from "../../contexts/MoviesContext";
 
-
-
 type MovieDetails = {
   id: number;
   title: string;
@@ -17,6 +15,7 @@ type MovieDetails = {
   runtime: string;
   release_date: string;
   vote_average: number;
+  genres: string[]; // Adicione o campo "genres" para armazenar os gêneros
 };
 
 type RouterProps = {
@@ -63,7 +62,7 @@ export function Details() {
       addFavoriteMovie(movieId);
     }
     setIsFavorite(!isFavorite);
-  };
+  }
 
   return (
     <View style={styles.container}>
@@ -130,6 +129,15 @@ export function Details() {
               </Text>
             </View>
           </View>
+          <View style={styles.genres}>
+  {movieDetails && movieDetails.genres && movieDetails.genres.map((genre, index) => (
+    <View key={index} style={styles.genreBubble}>
+      <Text style={styles.genreText}>{genre.name}</Text>
+    </View>
+  ))}
+</View>
+
+
         </View>
       )}
       <View style={styles.about}>
@@ -204,6 +212,26 @@ const styles = StyleSheet.create({
   descriptionText1: {
     marginRight: 10,
     color: "#FF8700",
+  },
+  genres: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    marginTop: 10,
+    justifyContent: "center"
+  },
+  genreBubble: {
+    backgroundColor: '#1e90ff',
+    borderRadius: 16,
+    paddingVertical: 4,
+    paddingHorizontal: 20,
+    marginRight: 10,
+    marginBottom: 30,
+  },
+  genreText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
   about: {
     padding: 20,
