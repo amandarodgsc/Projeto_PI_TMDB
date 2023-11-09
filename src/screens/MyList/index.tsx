@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { CalendarBlank, CaretLeft, Clock, Star } from 'phosphor-react-native';
+import axios from 'axios';
+import { api } from '../../services/api';
 
 export default function MyList() {
   const [allFavoriteMovies, setAllFavoriteMovies] = useState([]);
+  const [favoriteMovieDetails, setFavoriteMovieDetails] = useState([]);
   const { goBack, navigate } = useNavigation();
-
-  useEffect(() => {
-    loadFavoriteMovies();
-  }, []);
 
   const loadFavoriteMovies = async () => {
     try {
@@ -18,13 +17,54 @@ export default function MyList() {
       if (favoriteMoviesJSON) {
         const favoriteMovies = JSON.parse(favoriteMoviesJSON);
         setAllFavoriteMovies(favoriteMovies);
+        fetchFavoriteMovieDetails(favoriteMovies);
       }
     } catch (error) {
       console.error('Erro ao carregar filmes favoritos: ', error);
     }
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      loadFavoriteMovies();
+    }, [])
+  );
+
+  const addFavoriteMovie = async (movieId) => {
+    try {
+      const favoriteMoviesJSON = await AsyncStorage.getItem('@FavoriteMovies');
+      const favoriteMovies = favoriteMoviesJSON ? JSON.parse(favoriteMoviesJSON) : [];
+
+      favoriteMovies.push(movieId);
+      await AsyncStorage.setItem('@FavoriteMovies', JSON.stringify(favoriteMovies));
+
+      // Carregue os filmes favoritos novamente após adicionar
+      loadFavoriteMovies();
+    } catch (error) {
+      console.error('Erro ao adicionar filme favorito: ', error);
+    }
   };
 
-  console.log('LISTA DE FAVORITOS NA MyList ', allFavoriteMovies);
+  const fetchFavoriteMovieDetails = async (favoriteMovies) => {
+    try {
+      const detailsPromises = favoriteMovies
+        .filter((movieId) => movieId) // Filtrar IDs válidos (não nulos)
+        .map(async (movieId) => {
+          try {
+            const response = await api.get(`/movie/${movieId}`);
+            return response.data;
+          } catch (error) {
+            console.error('Erro ao buscar detalhes dos filmes: ', error);
+            return null;
+          }
+        });
+
+      const movieDetails = await Promise.all(detailsPromises);
+      setFavoriteMovieDetails(movieDetails.filter(Boolean)); // Remova valores nulos
+    } catch (error) {
+      console.error('Erro ao buscar detalhes dos filmes: ', error);
+    }
+  }
 
   function getYear(data) {
     const year = new Date(data).getFullYear();
@@ -41,49 +81,49 @@ export default function MyList() {
         <View style={{ width: 30, height: 30 }} />
       </View>
 
-      {allFavoriteMovies.length > 0 && (
+      {favoriteMovieDetails.length > 0 && (
         <ScrollView style={styles.contentMyList}>
-          {allFavoriteMovies.map((movie) => (
+          {favoriteMovieDetails.map((movieDetails) => (
             <TouchableOpacity
-              key={movie.id}
-              onPress={() => navigate('Details', { movieId: movie.id })}
+              key={movieDetails.id}
+              onPress={() => navigate('Details', { movieId: movieDetails.id })} // Correção aqui
               style={styles.card}
             >
               <Image
                 style={styles.cardImage}
                 source={{
-                  uri: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+                  uri: `https://image.tmdb.org/t/p/w500/${movieDetails.poster_path}`,
                 }}
               />
               <View style={styles.cardInfo}>
-                <Text style={styles.cardInfoTitle}>{movie.title}</Text>
+                <Text style={styles.cardInfoTitle}>{movieDetails.title}</Text>
                 <View style={styles.cardInfoInfoMovie}>
                   <View style={styles.cardInfoInfoMovieContent}>
                     <Star
-                      color={movie.vote_average >= 7 ? '#FF8700' : '#fff'}
+                      color={movieDetails.vote_average >= 7 ? '#FF8700' : '#fff'}
                       size={25}
-                      weight={movie.vote_average >= 7 ? 'duotone' : 'light'}
+                      weight={movieDetails.vote_average >= 7 ? 'duotone' : 'light'}
                     />
                     <Text
                       style={
-                        movie.vote_average >= 7
+                        movieDetails.vote_average >= 7
                           ? styles.cardInfoInfoMovieContentText2
                           : styles.cardInfoInfoMovieContentText
                       }
                     >
-                      {movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A'}
+                      {movieDetails.vote_average ? movieDetails.vote_average.toFixed(1) : 'N/A'}
                     </Text>
                   </View>
                   <View style={styles.cardInfoInfoMovieContent}>
                     <CalendarBlank color="#FFF" size={25} weight="thin" />
                     <Text style={styles.cardInfoInfoMovieContentText}>
-                      {getYear(movie.release_date)}
+                      {getYear(movieDetails.release_date)}
                     </Text>
                   </View>
                   <View style={styles.cardInfoInfoMovieContent}>
                     <Clock color="#FFF" size={25} weight="thin" />
                     <Text style={styles.cardInfoInfoMovieContentText}>
-                      {movie.runtime ? `${movie.runtime} Minutos` : 'N/A'}
+                      {movieDetails.runtime ? `${movieDetails.runtime} Minutos` : 'N/A'}
                     </Text>
                   </View>
                 </View>
@@ -92,7 +132,7 @@ export default function MyList() {
           ))}
         </ScrollView>
       )}
-      {allFavoriteMovies.length <= 0 && (
+      {favoriteMovieDetails.length <= 0 && (
         <View style={styles.moviesEmpty}>
           <Text style={styles.moviesEmptyTitle}>
             Ainda não há filmes na lista

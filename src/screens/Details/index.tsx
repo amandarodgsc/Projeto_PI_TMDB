@@ -5,6 +5,7 @@ import { BookmarkSimple, CalendarBlank, CaretLeft, Clock, Star } from "phosphor-
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { ActivityIndicator } from 'react-native';
 import { MovieContext } from "../../contexts/MoviesContext";
+import TrailerPlayer from "./TrailerPlayer";
 
 type MovieDetails = {
   id: number;
@@ -221,7 +222,7 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   genreBubble: {
-    backgroundColor: "rgba(30, 144, 255, 0.6)", // Cor de fundo do "balão" com opacidade
+    backgroundColor: '#1e90ff',
     borderRadius: 16,
     paddingVertical: 4,
     paddingHorizontal: 20,
