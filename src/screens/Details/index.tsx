@@ -141,7 +141,7 @@ export function Details() {
         </View>
       )}
       <View style={styles.about}>
-        <Text style={styles.aboutText}>Sinopse</Text>
+      <Text style={styles.aboutTitle}>Sinopse</Text>
         <Text style={styles.aboutText}>
           {movieDetails?.overview === ""
             ? "Ops! Parece que esse filme ainda não tem sinopse :-("
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   genreBubble: {
-    backgroundColor: '#1e90ff',
+    backgroundColor: "rgba(30, 144, 255, 0.6)", // Cor de fundo do "balão" com opacidade
     borderRadius: 16,
     paddingVertical: 4,
     paddingHorizontal: 20,
@@ -237,7 +237,18 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   aboutText: {
+    
     color: "#fff",
     textAlign: "justify",
   },
+  aboutTitle: {
+    fontSize: 20, // Tamanho de fonte maior
+    color: "#fff",
+    textAlign: "center",
+    fontWeight: "bold", // Pode ajustar o peso da fonte conforme desejado
+    backgroundColor: "rgba(30, 144, 255, 0.6)", // Cor de fundo do "balão" com opacidade
+    
+  }
+  
+  
 });
