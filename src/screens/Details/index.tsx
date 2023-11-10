@@ -3,9 +3,8 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { api } from "../../services/api";
 import { BookmarkSimple, CalendarBlank, CaretLeft, Clock, Star } from "phosphor-react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator } from 'react-native';  
 import { MovieContext } from "../../contexts/MoviesContext";
-import TrailerPlayer from "./TrailerPlayer";
 
 type MovieDetails = {
   id: number;
