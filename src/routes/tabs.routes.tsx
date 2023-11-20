@@ -1,10 +1,13 @@
+// TabRoutes.tsx
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { BookmarkSimple, House, MagnifyingGlass } from 'phosphor-react-native';
 import { Home } from '../screens/Home';
 import { Search } from '../screens/Search';
-import MyList from '../screens/MyList'; // Corrigi a importação para o MyList
+import MyList from '../screens/MyList';
 import { Details } from '../screens/Details';
+import ActorDetails from '../screens/Details/ActorDetails';
 
 const { Navigator, Screen } = createBottomTabNavigator();
 
@@ -57,6 +60,14 @@ export function TabRoutes() {
           tabBarIcon: ({ color }) => (
             <MagnifyingGlass color={color} size={30} weight="light" />
           ),
+        }}
+      />
+      {/* Corrigir a configuração da tela ActorDetails */}
+      <Screen
+        name="ActorDetails"
+        component={ActorDetails}
+        options={{
+          tabBarButton: () => null,
         }}
       />
     </Navigator>

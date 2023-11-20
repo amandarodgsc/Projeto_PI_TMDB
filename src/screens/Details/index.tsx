@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useContext } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { api } from "../../services/api";
-import { BookmarkSimple, CalendarBlank, CaretLeft, Clock, Star } from "phosphor-react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { ActivityIndicator } from 'react-native';  
-import { MovieContext } from "../../contexts/MoviesContext";
+import React, { useEffect, useState, useContext } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View, FlatList, ScrollView } from 'react-native';
+import { api } from '../../services/api';
+import { BookmarkSimple, CalendarBlank, CaretLeft, Clock, Star } from 'phosphor-react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { ActivityIndicator } from 'react-native';
+import { MovieContext } from '../../contexts/MoviesContext';
+import YouTube from 'react-native-youtube-iframe'; // Importe o componente YouTube
 
 type MovieDetails = {
   id: number;
@@ -15,7 +16,8 @@ type MovieDetails = {
   runtime: string;
   release_date: string;
   vote_average: number;
-  genres: string[]; // Adicione o campo "genres" para armazenar os gêneros
+  genres: string[];
+  videos: { results: { key: string }[] }; // Ajuste para refletir a estrutura real dos vídeos
 };
 
 type RouterProps = {
@@ -30,12 +32,17 @@ export function Details() {
   const navigation = useNavigation();
   const [isFavorite, setIsFavorite] = useState(false);
   const { addFavoriteMovie, removeFavoriteMovie, favoriteMovies } = useContext(MovieContext);
+  const [cast, setCast] = useState([]);
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
       try {
         setLoading(true);
-        const response = await api.get(`/movie/${movieId}`);
+        const response = await api.get(`/movie/${movieId}`, {
+          params: {
+            append_to_response: 'videos',
+          },
+        });
         setMovieDetails(response.data);
         setLoading(false);
       } catch (error) {
@@ -43,16 +50,15 @@ export function Details() {
         setLoading(false);
       }
     };
+
     fetchMovieDetails();
 
-    // Check if the movie is in favorites and set isFavorite accordingly
     const isMovieInFavorites = favoriteMovies.includes(movieId);
     setIsFavorite(isMovieInFavorites);
   }, [movieId, favoriteMovies]);
 
   function getYear(data: string) {
-    const ano = new Date(data).getFullYear();
-    return ano;
+    return new Date(data).getFullYear();
   }
 
   const toggleFavorite = () => {
@@ -64,15 +70,32 @@ export function Details() {
     setIsFavorite(!isFavorite);
   }
 
+  useEffect(() => {
+    const fetchMovieCast = async () => {
+      try {
+        const response = await api.get(`/movie/${movieId}/credits`);
+        setCast(response.data.cast);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchMovieCast();
+  }, [movieId]);
+
+  const navigateToActorDetails = (actorId: number) => {
+    navigation.navigate("ActorDetails", { actorId });
+  };
+
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <CaretLeft color="#fff" size={32} weight="thin" />
         </TouchableOpacity>
         <Text style={styles.headerText}>Detalhes</Text>
         <TouchableOpacity onPress={toggleFavorite}>
-          <BookmarkSimple color={isFavorite ? "gold" : "#fff"} size={32} weight="thin" />
+          <BookmarkSimple color={isFavorite ? 'gold' : '#fff'} size={32} weight="thin" />
         </TouchableOpacity>
       </View>
       {loading && <ActivityIndicator size="large" color="#fff" />}
@@ -90,6 +113,14 @@ export function Details() {
             }}
             style={styles.detailsPosterImage}
           />
+          {/* Adicionando o componente YouTube */}
+          {movieDetails?.videos?.results?.length > 0 && (
+            <YouTube
+              apiKey="006b2e34948649813a969980105785b1" // Substitua pelo seu próprio chave da API do YouTube
+              videoId={movieDetails.videos.results[0].key}
+              style={{ alignSelf: 'stretch', height: 200 }}
+            />
+          )}
           <Text style={styles.titleMovie}>{movieDetails?.title}</Text>
           <View style={styles.description}>
             <View style={styles.descriptionGroup}>
@@ -100,9 +131,9 @@ export function Details() {
             </View>
             <View style={styles.descriptionGroup}>
               <Clock color="#92929D" size={25} weight="thin" />
-              <Text
-                style={styles.descriptionText}
-              >{`${movieDetails?.runtime} minutos`}</Text>
+              <Text style={styles.descriptionText}>
+                {`${movieDetails?.runtime} minutos`}
+              </Text>
             </View>
             <View style={styles.descriptionGroup}>
               <Star
@@ -130,25 +161,52 @@ export function Details() {
             </View>
           </View>
           <View style={styles.genres}>
-  {movieDetails && movieDetails.genres && movieDetails.genres.map((genre, index) => (
-    <View key={index} style={styles.genreBubble}>
-      <Text style={styles.genreText}>{genre.name}</Text>
-    </View>
-  ))}
-</View>
-
-
+            {movieDetails &&
+              movieDetails.genres &&
+              movieDetails.genres.map((genre, index) => (
+                <View key={index} style={styles.genreBubble}>
+                  <Text style={styles.genreText}>{genre.name}</Text>
+                </View>
+              ))}
+          </View>
+          <View style={styles.about}>
+            <Text style={styles.genreBubble}>Sinopse</Text>
+            <Text style={styles.aboutText}>
+              {movieDetails?.overview ===
+                ? "Ops! Parece que esse filme ainda não tem sinopse :-("
+                : movieDetails?.overview}
+            </Text>
+          </View>
+          <View style={styles.castContainer}>
+            <Text style={styles.genreBubble}>Elenco</Text>
+            {cast.length > 0 ? (
+              <FlatList
+                data={cast}
+                keyExtractor={(item) => item.id.toString()}
+                horizontal
+                renderItem={({ item }) => (
+                  <TouchableOpacity onPress={() => navigateToActorDetails(item.id)}>
+                    <View style={styles.castItem}>
+                      <Image
+                        source={{
+                          uri: `https://image.tmdb.org/t/p/w200${item.profile_path}`,
+                        }}
+                        style={styles.castImage}
+                      />
+                      <Text style={styles.castName}>{item.name}</Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
+              />
+            ) : (
+              <Text style={styles.aboutText}>
+                Nenhum dado sobre o elenco disponível.
+              </Text>
+            )}
+          </View>
         </View>
       )}
-      <View style={styles.about}>
-      <Text style={styles.aboutTitle}>Sinopse</Text>
-        <Text style={styles.aboutText}>
-          {movieDetails?.overview === ""
-            ? "Ops! Parece que esse filme ainda não tem sinopse :-("
-            : movieDetails?.overview}
-        </Text>
-      </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -225,8 +283,10 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingVertical: 4,
     paddingHorizontal: 20,
-    marginRight: 10,
-    marginBottom: 30,
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
   genreText: {
     color: '#fff',
@@ -237,18 +297,24 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   aboutText: {
-    
     color: "#fff",
     textAlign: "justify",
   },
-  aboutTitle: {
-    fontSize: 20, // Tamanho de fonte maior
-    color: "#fff",
-    textAlign: "center",
-    fontWeight: "bold", // Pode ajustar o peso da fonte conforme desejado
-    backgroundColor: "rgba(30, 144, 255, 0.6)", // Cor de fundo do "balão" com opacidade
-    
-  }
-  
-  
+  castContainer: {
+    padding: 20,
+  },
+  castItem: {
+    marginRight: 16,
+    alignItems: 'center',
+  },
+  castImage: {
+    width: 100,
+    height: 150,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  castName: {
+    color: '#fff',
+    textAlign: 'center',
+  },
 });
