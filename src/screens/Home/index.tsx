@@ -81,6 +81,28 @@ export function Home() {
   </View>
 );
 
+const loadMoviesByCategory = async (category: string) => {
+  try {
+    setLoading(true);
+    const response = await api.get('/discover/movie', {
+      params: {
+        with_genres: category,
+        page,
+      },
+    });
+
+    setDiscoveryMovies([...discoveryMovies, ...response.data.results]);
+    setPage(page + 1);
+    setLoading(false);
+  } catch (error) {
+    console.error('Erro ao buscar filmes da categoria:', error);
+    setLoading(false);
+  }
+};
+useEffect(() => {
+  loadMoviesByCategory('28'); // Substitua '28' pela categoria desejada
+}, []); // Executa apenas uma vez no carregamento inicial
+
 
   const movieData = search.length > 2 ? searchResults : discoveryMovies;
 

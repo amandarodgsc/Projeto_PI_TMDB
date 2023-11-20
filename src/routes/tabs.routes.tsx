@@ -1,15 +1,16 @@
 // TabRoutes.tsx
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { BookmarkSimple, House, MagnifyingGlass } from 'phosphor-react-native';
+import { BookmarkSimple, House, MagnifyingGlass, Folder } from 'phosphor-react-native';
 import { Home } from '../screens/Home';
 import { Search } from '../screens/Search';
 import MyList from '../screens/MyList';
 import { Details } from '../screens/Details';
 import ActorDetails from '../screens/Details/ActorDetails';
+import { Categories } from '../screens/Categorias/Categories';
 
 const { Navigator, Screen } = createBottomTabNavigator();
+console.log('Renderizando TabRoutes');
 
 export function TabRoutes() {
   return (
@@ -70,6 +71,8 @@ export function TabRoutes() {
           tabBarButton: () => null,
         }}
       />
+    
+
     </Navigator>
   );
 }

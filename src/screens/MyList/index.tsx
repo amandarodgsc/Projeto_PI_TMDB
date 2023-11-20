@@ -149,8 +149,7 @@ export default function MyList() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1E1E1E',
-  },
+    backgroundColor: '#242A32'  },
   header: {
     paddingTop: 30,
     height: 115,

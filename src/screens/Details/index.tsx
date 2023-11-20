@@ -172,9 +172,9 @@ export function Details() {
           <View style={styles.about}>
             <Text style={styles.genreBubble}>Sinopse</Text>
             <Text style={styles.aboutText}>
-              {movieDetails?.overview ===
-                ? "Ops! Parece que esse filme ainda não tem sinopse :-("
-                : movieDetails?.overview}
+            {!movieDetails?.overview
+  ? "Ops! Parece que esse filme ainda não tem sinopse :-("
+  : movieDetails?.overview}
             </Text>
           </View>
           <View style={styles.castContainer}>
@@ -213,8 +213,7 @@ export function Details() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1E1E1E",
-  },
+    backgroundColor: '#242A32'  },
   header: {
     paddingTop: 30,
     height: 115,
