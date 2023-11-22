@@ -17,7 +17,7 @@ type MovieDetails = {
   release_date: string;
   vote_average: number;
   genres: string[];
-  videos: { results: { key: string }[] }; // Ajuste para refletir a estrutura real dos vídeos
+  videos: { results: { key: string; name: string }[] }; // Ajuste para refletir a estrutura real dos vídeos
 };
 
 type RouterProps = {
@@ -33,6 +33,7 @@ export function Details() {
   const [isFavorite, setIsFavorite] = useState(false);
   const { addFavoriteMovie, removeFavoriteMovie, favoriteMovies } = useContext(MovieContext);
   const [cast, setCast] = useState([]);
+  const [trailers, setTrailers] = useState<{ key: string; name: string }[]>([]);
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
@@ -57,6 +58,26 @@ export function Details() {
     setIsFavorite(isMovieInFavorites);
   }, [movieId, favoriteMovies]);
 
+  useEffect(() => {
+    const fetchMovieCast = async () => {
+      try {
+        const response = await api.get(`/movie/${movieId}/credits`);
+        setCast(response.data.cast);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchMovieCast();
+
+    const extractedTrailers = movieDetails?.videos?.results.map((video: any) => ({
+      key: video.key,
+      name: video.name,
+    })) || [];
+
+    setTrailers(extractedTrailers);
+  }, [movieId, movieDetails?.videos?.results]);
+
   function getYear(data: string) {
     return new Date(data).getFullYear();
   }
@@ -69,19 +90,6 @@ export function Details() {
     }
     setIsFavorite(!isFavorite);
   }
-
-  useEffect(() => {
-    const fetchMovieCast = async () => {
-      try {
-        const response = await api.get(`/movie/${movieId}/credits`);
-        setCast(response.data.cast);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchMovieCast();
-  }, [movieId]);
 
   const navigateToActorDetails = (actorId: number) => {
     navigation.navigate("ActorDetails", { actorId: actorId });
@@ -113,14 +121,6 @@ export function Details() {
             }}
             style={styles.detailsPosterImage}
           />
-          {/* Adicionando o componente YouTube */}
-          {movieDetails?.videos?.results?.length > 0 && (
-            <YouTube
-              apiKey="006b2e34948649813a969980105785b1" // Substitua pelo seu próprio chave da API do YouTube
-              videoId={movieDetails.videos.results[0].key}
-              style={{ alignSelf: 'stretch', height: 200 }}
-            />
-          )}
           <Text style={styles.titleMovie}>{movieDetails?.title}</Text>
           <View style={styles.description}>
             <View style={styles.descriptionGroup}>
@@ -172,9 +172,9 @@ export function Details() {
           <View style={styles.about}>
             <Text style={styles.genreBubble}>Sinopse</Text>
             <Text style={styles.aboutText}>
-            {!movieDetails?.overview
-  ? "Ops! Parece que esse filme ainda não tem sinopse :-("
-  : movieDetails?.overview}
+              {!movieDetails?.overview
+                ? "Ops! Parece que esse filme ainda não tem sinopse :-("
+                : movieDetails?.overview}
             </Text>
           </View>
           <View style={styles.castContainer}>
@@ -204,6 +204,14 @@ export function Details() {
               </Text>
             )}
           </View>
+          {trailers.map((trailer) => (
+            <YouTube
+              key={trailer.key}
+              apiKey="006b2e34948649813a969980105785b1"
+              videoId={trailer.key}
+              style={{ alignSelf: 'stretch', height: 200 }}
+            />
+          ))}
         </View>
       )}
     </ScrollView>
