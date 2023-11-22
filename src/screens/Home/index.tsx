@@ -114,7 +114,8 @@ useEffect(() => {
       {/* Adicione a logo do TMDB ao lado do texto */}
       <View style={styles.headerContent}>
         <Image
-          source={require("../../img/R.png")}
+        
+          source={require("../../img/r2.png")}
           style={styles.logo}
           resizeMode="contain"
         />
