@@ -20,6 +20,7 @@ import {
 
 import { api } from "../../services/api";
 
+// Interface para representar a estrutura de dados de um filme
 interface Movie {
   id: number;
   title: string;
@@ -30,11 +31,15 @@ interface Movie {
 }
 
 export function Search() {
+  // Estado para armazenar os resultados da busca
   const [searchResults, setSearchResults] = useState<Movie[]>([]);
+  // Estado para armazenar o texto da barra de pesquisa
   const [searchText, setSearchText] = useState('');
 
+  // Função de navegação do React Navigation
   const { navigate, goBack } = useNavigation();
 
+  // Função assíncrona para buscar filmes na API
   const searchMovies = async (query: string) => {
     const response = await api.get('/search/movie', {
       params: {
@@ -44,8 +49,10 @@ export function Search() {
     setSearchResults(response.data.results);
   };
 
+  // Função chamada quando o texto da barra de pesquisa é alterado
   const handleSearch = (text: string) => {
     setSearchText(text);
+    // Realiza a busca apenas se o texto for maior que 2 caracteres
     if (text.length > 2) {
       searchMovies(text);
     } else {
@@ -55,6 +62,7 @@ export function Search() {
 
   return (
     <View style={styles.container}>
+      {/* Cabeçalho */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => goBack()}>
           <CaretLeft color="#fff" size={32} weight="thin" />
@@ -62,6 +70,8 @@ export function Search() {
         <Text style={styles.headerText}>Buscar filmes</Text>
         <WarningCircle color="#fff" size={32} weight="thin" />
       </View>
+
+      {/* Barra de Pesquisa */}
       <View style={styles.content}>
         <View style={styles.containerInput}>
           <TextInput
@@ -75,6 +85,7 @@ export function Search() {
         </View>
       </View>
 
+      {/* Resultados da Pesquisa */}
       <ScrollView style={styles.contentMyList}>
         {searchResults.map((movie) => (
           <TouchableOpacity
@@ -82,12 +93,15 @@ export function Search() {
             key={movie.id}
             onPress={() => navigate('Details', { movieId: movie.id })}
           >
+            {/* Imagem do Filme */}
             <Image
               style={styles.cardImage}
               source={{
                 uri: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
               }}
             />
+
+            {/* Informações do Filme */}
             <View style={styles.cardInfo}>
               <Text style={styles.cardInfoTitle}>{movie.title}</Text>
               <View style={styles.cardInfoInfoMovie}>
@@ -118,10 +132,12 @@ export function Search() {
   );
 }
 
+// Estilos para a tela
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#242A32'  },
+    backgroundColor: '#242A32',
+  },
   header: {
     paddingTop: 30,
     height: 115,
@@ -148,7 +164,6 @@ export const styles = StyleSheet.create({
     color: '#fff',
     width: '80%',
   },
-
   content: {
     padding: 20,
   },

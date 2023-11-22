@@ -5,8 +5,9 @@ import { BookmarkSimple, CalendarBlank, CaretLeft, Clock, Star } from 'phosphor-
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { ActivityIndicator } from 'react-native';
 import { MovieContext } from '../../contexts/MoviesContext';
-import YouTube from 'react-native-youtube-iframe'; // Importe o componente YouTube
+import YouTube from 'react-native-youtube-iframe';
 
+// Definindo o tipo para os detalhes do filme
 type MovieDetails = {
   id: number;
   title: string;
@@ -20,11 +21,13 @@ type MovieDetails = {
   videos: { results: { key: string; name: string }[] }; // Ajuste para refletir a estrutura real dos vídeos
 };
 
+// Definindo o tipo para as propriedades de roteamento
 type RouterProps = {
   movieId: number;
 };
 
 export function Details() {
+  // Estados necessários para armazenar dados do filme, estado de carregamento, etc.
   const [movieDetails, setMovieDetails] = useState<MovieDetails | null>(null);
   const [loading, setLoading] = useState(false);
   const route = useRoute();
@@ -35,6 +38,7 @@ export function Details() {
   const [cast, setCast] = useState([]);
   const [trailers, setTrailers] = useState<{ key: string; name: string }[]>([]);
 
+  // Efeito para carregar detalhes do filme e verificar se está nos favoritos ao montar o componente
   useEffect(() => {
     const fetchMovieDetails = async () => {
       try {
@@ -52,12 +56,14 @@ export function Details() {
       }
     };
 
-    fetchMovieDetails();
-
+    // Verifica se o filme está nos favoritos
     const isMovieInFavorites = favoriteMovies.includes(movieId);
     setIsFavorite(isMovieInFavorites);
+
+    fetchMovieDetails();
   }, [movieId, favoriteMovies]);
 
+  // Efeito para carregar elenco e trailers
   useEffect(() => {
     const fetchMovieCast = async () => {
       try {
@@ -70,18 +76,20 @@ export function Details() {
 
     fetchMovieCast();
 
+    // Extrai trailers da resposta e atualiza o estado
     const extractedTrailers = movieDetails?.videos?.results.map((video: any) => ({
       key: video.key,
       name: video.name,
     })) || [];
-
     setTrailers(extractedTrailers);
   }, [movieId, movieDetails?.videos?.results]);
 
+  // Função auxiliar para obter o ano a partir da data
   function getYear(data: string) {
     return new Date(data).getFullYear();
   }
 
+  // Função para alternar entre adicionar/remover dos favoritos
   const toggleFavorite = () => {
     if (isFavorite) {
       removeFavoriteMovie(movieId);
@@ -91,10 +99,12 @@ export function Details() {
     setIsFavorite(!isFavorite);
   }
 
+  // Função para navegar para detalhes do ator
   const navigateToActorDetails = (actorId: number) => {
     navigation.navigate("ActorDetails", { actorId: actorId });
   };
 
+  // Renderização da UI
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -109,19 +119,26 @@ export function Details() {
       {loading && <ActivityIndicator size="large" color="#fff" />}
       {!loading && (
         <View>
+          
+          {/* Imagem de fundo */}
           <Image
             source={{
               uri: `https://image.tmdb.org/t/p/w500${movieDetails?.backdrop_path}`,
             }}
             style={styles.detailsImage}
           />
+          {/* Imagem do pôster */}
           <Image
             source={{
               uri: `https://image.tmdb.org/t/p/w500${movieDetails?.poster_path}`,
             }}
             style={styles.detailsPosterImage}
           />
+
+          {/* Título do filme */}
           <Text style={styles.titleMovie}>{movieDetails?.title}</Text>
+
+          {/* Detalhes como ano, duração, classificação e gêneros */}
           <View style={styles.description}>
             <View style={styles.descriptionGroup}>
               <CalendarBlank color="#92929D" size={25} weight="thin" />
@@ -160,6 +177,8 @@ export function Details() {
               </Text>
             </View>
           </View>
+
+          {/* Gêneros do filme */}
           <View style={styles.genres}>
             {movieDetails &&
               movieDetails.genres &&
@@ -169,6 +188,8 @@ export function Details() {
                 </View>
               ))}
           </View>
+
+          {/* Sinopse do filme */}
           <View style={styles.about}>
             <Text style={styles.genreBubble}>Sinopse</Text>
             <Text style={styles.aboutText}>
@@ -177,6 +198,8 @@ export function Details() {
                 : movieDetails?.overview}
             </Text>
           </View>
+
+          {/* Elenco do filme */}
           <View style={styles.castContainer}>
             <Text style={styles.genreBubble}>Elenco</Text>
             {cast.length > 0 ? (
@@ -204,6 +227,7 @@ export function Details() {
               </Text>
             )}
           </View>
+          {/* Trailers do filme */}
           {trailers.map((trailer) => (
             <YouTube
               key={trailer.key}
@@ -218,10 +242,12 @@ export function Details() {
   );
 }
 
+// Estilos da Tela
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#242A32'  },
+    backgroundColor: '#242A32',
+  },
   header: {
     paddingTop: 30,
     height: 115,
