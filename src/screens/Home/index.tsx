@@ -22,7 +22,7 @@ export function Home() {
   const [searchResults, setSearchResultsMovies] = useState<Movie[]>([]);
   const [noResults, setNoResults] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
-
+  const maxDots = 8; 
   useEffect(() => {
     loadMoreData();
   }, []);
@@ -136,16 +136,16 @@ useEffect(() => {
           autoplayInterval={5000} // Mudar o intervalo de autoplay conforme necessário
         />
         <Pagination
-          dotsLength={discoveryMovies.length}
-          activeDotIndex={activeSlide}
-          containerStyle={styles.paginationContainer}
-          dotStyle={styles.paginationDot}
-          inactiveDotStyle={{
-            // Pode customizar o estilo do ponto inativo aqui
-          }}
-          inactiveDotOpacity={0.4}
-          inactiveDotScale={0.6}
-        />
+        dotsLength={Math.min(maxDots, discoveryMovies.length)} // Garante que o número de bolinhas não exceda maxDots
+        activeDotIndex={activeSlide}
+        containerStyle={styles.paginationContainer}
+        dotStyle={styles.paginationDot}
+        inactiveDotStyle={{
+          // Pode customizar o estilo do ponto inativo aqui
+        }}
+        inactiveDotOpacity={0.4}
+        inactiveDotScale={0.6}
+      />
         
             {/* Frase "Em destaque:" centralizada com as cores padrão do site */}
     <View style={styles.highlightContainer}>

@@ -84,7 +84,7 @@ export function Details() {
   }, [movieId]);
 
   const navigateToActorDetails = (actorId: number) => {
-    navigation.navigate("ActorDetails", { actorId });
+    navigation.navigate("ActorDetails", { actorId: actorId });
   };
 
   return (

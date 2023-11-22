@@ -1,4 +1,3 @@
-// ActorDetailsScreen.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
 import { api } from '../../services/api';
@@ -9,6 +8,10 @@ const ActorDetailsScreen = ({ route, navigation }) => {
   const [actorDetails, setActorDetails] = useState(null);
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const navigateToMovieDetails = (movieId) => {
+    navigation.navigate('Details', { movieId });
+  };
 
   useEffect(() => {
     const fetchActorDetails = async () => {
@@ -66,7 +69,7 @@ const ActorDetailsScreen = ({ route, navigation }) => {
             }}
           />
           <Text style={styles.actorName}>{actorDetails.name}</Text>
-          {/* Include additional actor details as needed */}
+          {/* Inclua detalhes adicionais do ator conforme necessário */}
         </View>
       )}
 
@@ -75,49 +78,45 @@ const ActorDetailsScreen = ({ route, navigation }) => {
           data={movies}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => {
-                // Navegue para a página de detalhes do filme
-                // Certifique-se de ter a rota e o componente apropriados
-              }}
-              style={styles.card}
-            >
-              <Image
-                style={styles.cardImage}
-                source={{
-                  uri: `https://image.tmdb.org/t/p/w500/${item.poster_path}`,
-                }}
-              />
-              <View style={styles.cardInfo}>
-                <Text style={styles.cardInfoTitle}>{item.title}</Text>
-                <View style={styles.cardInfoInfoMovie}>
-                  <View style={styles.cardInfoInfoMovieContent}>
-                    <Star
-                      color={item.vote_average >= 7 ? '#FF8700' : '#fff'}
-                      size={25}
-                      weight={item.vote_average >= 7 ? 'duotone' : 'light'}
-                    />
-                    <Text
-                      style={
-                        item.vote_average >= 7
-                          ? styles.cardInfoInfoMovieContentText2
-                          : styles.cardInfoInfoMovieContentText
-                      }
-                    >
-                      {item.vote_average ? item.vote_average.toFixed(1) : 'N/A'}
-                    </Text>
-                  </View>
-                  <View style={styles.cardInfoInfoMovieContent}>
-                    <CalendarBlank color="#FFF" size={25} weight="thin" />
-                    <Text style={styles.cardInfoInfoMovieContentText}>
-                      {item.release_date ? new Date(item.release_date).getFullYear() : 'N/A'}
-                    </Text>
-                  </View>
-                  <View style={styles.cardInfoInfoMovieContent}>
-                    <Clock color="#FFF" size={25} weight="thin" />
-                    <Text style={styles.cardInfoInfoMovieContentText}>
-                      {item.runtime ? `${item.runtime} Minutos` : 'N/A'}
-                    </Text>
+            <TouchableOpacity onPress={() => navigateToMovieDetails(item.id)}>
+              <View style={styles.movieCard}>
+                <Image
+                  style={styles.cardImage}
+                  source={{
+                    uri: `https://image.tmdb.org/t/p/w500/${item.poster_path}`,
+                  }}
+                />
+                <View style={styles.movieInfo}>
+                  <Text style={styles.cardInfoTitle}>{item.title}</Text>
+                  <View style={styles.cardInfoInfoMovie}>
+                    <View style={styles.cardInfoInfoMovieContent}>
+                      <Star
+                        color={item.vote_average >= 7 ? '#FF8700' : '#fff'}
+                        size={25}
+                        weight={item.vote_average >= 7 ? 'duotone' : 'light'}
+                      />
+                      <Text
+                        style={
+                          item.vote_average >= 7
+                            ? styles.cardInfoInfoMovieContentText2
+                            : styles.cardInfoInfoMovieContentText
+                        }
+                      >
+                        {item.vote_average ? item.vote_average.toFixed(1) : 'N/A'}
+                      </Text>
+                    </View>
+                    <View style={styles.cardInfoInfoMovieContent}>
+                      <CalendarBlank color="#FFF" size={25} weight="thin" />
+                      <Text style={styles.cardInfoInfoMovieContentText}>
+                        {item.release_date ? new Date(item.release_date).getFullYear() : 'N/A'}
+                      </Text>
+                    </View>
+                    <View style={styles.cardInfoInfoMovieContent}>
+                      <Clock color="#FFF" size={25} weight="thin" />
+                      <Text style={styles.cardInfoInfoMovieContentText}>
+                        {item.runtime ? `${item.runtime} Minutos` : 'N/A'}
+                      </Text>
+                    </View>
                   </View>
                 </View>
               </View>
@@ -137,7 +136,8 @@ const ActorDetailsScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#242A32'  },
+    backgroundColor: '#242A32',
+  },
   header: {
     paddingTop: 30,
     height: 115,
@@ -170,13 +170,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginTop: 10,
   },
-  card: {
-    width: '100%',
+  movieCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#393E46',
+    marginBottom: 20,
+    padding: 10,
+    backgroundColor: '#393E46', // Cor de fundo do card
+    borderRadius: 16,
   },
   cardImage: {
     width: 80,
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginRight: 10,
   },
-  cardInfo: {
+  movieInfo: {
     flex: 1,
   },
   cardInfoTitle: {

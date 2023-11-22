@@ -7,7 +7,6 @@ import { Search } from '../screens/Search';
 import MyList from '../screens/MyList';
 import { Details } from '../screens/Details';
 import ActorDetails from '../screens/Details/ActorDetails';
-import { Categories } from '../screens/Categorias/Categories';
 
 const { Navigator, Screen } = createBottomTabNavigator();
 console.log('Renderizando TabRoutes');
